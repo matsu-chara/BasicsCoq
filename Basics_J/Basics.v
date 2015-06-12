@@ -57,6 +57,8 @@ Proof. simpl. reflexivity. Qed.
 Example test_orb4: (orb true true) = true.
 Proof. simpl. reflexivity. Qed.
 
+Definition admit {T: Type} : T. Admitted.
+
 Definition nandb (b1: bool)(b2:bool): bool :=
   negb(andb(b1)(b2)).
 
@@ -167,4 +169,80 @@ Fixpoint factorial (n:nat) : nat :=
   end.
 
 Example test_factorial1: (factorial 3) = 6.
+Proof. simpl. reflexivity. Qed.
 Example test_factorial2: (factorial 5) = (mult 10 12).
+Proof. simpl. reflexivity. Qed.
+
+Notation "x +_ y" := (plus x y)(at level 50, left associativity) : nat_scope.
+Notation "x -_ y" := (minus x y)(at level 50, left associativity) : nat_scope.
+Notation "x *_ y" := (mult x y)(at level 40, left associativity) : nat_scope.
+
+Check ((0 +_ 1) + 1).
+
+Fixpoint beq_nat (n m: nat): bool :=
+  match n with
+    | O => match m with
+             | O => true
+             | S m' => false
+           end
+    | S n' => match m with
+                | O => false
+                | S m' => beq_nat n' m'
+              end
+  end.
+
+Fixpoint ble_nat (n m: nat) :bool :=
+  match n with
+    | O => true
+    | S n' =>
+      match m with
+        | O => false
+        | S m' => ble_nat n' m'
+      end
+  end.
+
+Example test_ble_nat1: (ble_nat 2 2) = true.
+Proof. simpl. reflexivity. Qed.
+Example test_ble_nat2: (ble_nat 2 4) = true.
+Proof. simpl. reflexivity. Qed.
+Example test_ble_nat3: (ble_nat 4 2) = false.
+Proof. simpl. reflexivity. Qed.
+
+Definition blt_nat (n m: nat) :bool :=
+  andb (ble_nat n m) (negb (beq_nat n m)).
+       
+Example test_blt_nat1: (blt_nat 2 2) = false.
+Proof. simpl. reflexivity. Qed.
+Example test_blt_nat2: (blt_nat 2 4) = true.
+Proof. simpl. reflexivity. Qed.
+Example test_blt_nat3: (blt_nat 4 2) = false.
+Proof. simpl. reflexivity. Qed.
+
+Theorem plus_O_n : forall n:nat, 0 + n = n.
+  Proof.
+    simpl. reflexivity. Qed.
+
+Eval simpl in (forall n:nat, n + O = n).
+Eval simpl in (forall n:nat, 0 + n = n).
+
+Theorem plus_O_n''  : forall n: nat, O + n = n.
+Proof.
+  intros n. reflexivity. Qed.
+
+Theorem plus_1_l: forall n:nat,  1 + n = S n.
+Proof.
+  intros n. reflexivity. Qed.
+
+Theorem mult_O_l: forall n:nat, O * n = O.
+Proof.
+  intros n. reflexivity. Qed.
+
+Theorem plus_id_example: forall n m: nat,
+  n = m ->
+  n + n = m + m.
+Proof.
+  intros n m. intros H. rewrite -> H. reflexivity. Qed.
+
+Theorem plus_id_exercise : forall n m o : nat,
+                             n = m -> m = o -> n + m = m + o.
+  
