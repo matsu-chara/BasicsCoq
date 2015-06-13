@@ -476,6 +476,43 @@ Proof.
   rewrite -> plus_assoc. rewrite <- H.
   reflexivity. Qed.
 
+(* 不要 *)
+Lemma mult_1_r : forall n:nat,
+  n * 1 = n.
+Proof.
+  induction n as [| n'].
+  Case "n = O".
+    reflexivity.
+  Case "n = S n'".
+    rewrite -> mult_1_plus.
+    rewrite -> IHn'.
+    simpl.
+  reflexivity. Qed.
+
+(* 不要 *)
+Lemma succ_id : forall n m:nat,
+  n = m -> S n = S m.
+Proof.
+  intros n m H.
+    rewrite -> H.
+  reflexivity. Qed.
+
+(* mult_commに使用 *)
+Lemma mult_dist: forall n m:nat,
+  n * (S m) = n + n * m.
+Proof.
+  intros n m.
+  induction n as [| n'].
+  Case "n = O".
+    reflexivity.
+  Case "n = S n'".
+    simpl.
+    rewrite -> plus_swap.
+    rewrite <- IHn'.
+    simpl.
+    reflexivity.
+  Qed.
+
 Theorem mult_comm : forall m n: nat,
   m * n = n * m.
 Proof.
@@ -485,13 +522,41 @@ Proof.
     rewrite -> mult_O_l.
     rewrite -> mult_O_r.
     reflexivity.
-  assert (H: m * S n = m + m * n).
-    induction n as [| n'].
-    Case "n = O".
-       reflexivity.
-    Case "n = S n'".
-     rewrite -> mult_1_plus.
-     rewrite -> IHn'.
-     rewrite -> plus_swap.
-     rewrite -> plus_assoc.
-     rewrite -> plus_comm.
+  Case "n = S n'".
+    rewrite -> mult_1_plus.
+    rewrite -> mult_dist.
+    rewrite <- IHn'.
+    reflexivity.
+  Qed.
+
+Theorem evenb_n_oddb_Sn: forall n:nat,
+  evenb n = negb (evenb (S n)).
+Proof.
+  intros n.
+  induction n as [| n'].
+  Case "n = O".
+    simpl. reflexivity.
+  Case "n = S n'".
+    assert (H: evenb (S (S n')) = evenb n').
+      simpl. reflexivity.
+    rewrite -> H.
+    rewrite -> IHn'.
+    rewrite -> negb_involutive.
+    reflexivity.
+Qed.
+
+Theorem plus_swap': forall n m p: nat,
+  n + (m + p) = m + (n + p).
+Proof.
+  intros n m p.
+  assert (H: m + (n + p) = n + m + p).
+    replace (n + m) with (m + n).
+    rewrite -> plus_assoc.
+    reflexivity.
+    rewrite -> plus_comm.
+    reflexivity.
+  rewrite -> H.
+  rewrite -> plus_assoc.
+  reflexivity.
+Qed.
+
